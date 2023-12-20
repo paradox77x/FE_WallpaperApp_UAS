@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../imagepage.dart';
 import '../views/favorite_view.dart';
+import '../category.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,7 +13,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final int _index = 0;
   int index_size = 0;
-  final _kategory = ['Alam', 'Hot', 'Game', 'Sexy'];
+  static List<BoxData> boxes = [
+    BoxData("Nature", "lib/wallpapers/alam.jpg"),
+    BoxData("Game", "lib/wallpapers/game.jpg"),
+    BoxData("Hot", "lib/wallpapers/hot.jpg"),
+    BoxData("Sexy", "lib/wallpapers/sexy.jpg"),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -60,21 +66,21 @@ class _HomePageState extends State<HomePage> {
                       duration: const Duration(milliseconds: 400),
                       curve: Curves.fastOutSlowIn,
                       padding: _index == index
-                          ? const EdgeInsets.only()
-                          : const EdgeInsets.only(
+                          ? EdgeInsets.only()
+                          : EdgeInsets.only(
                               top: 8.0, bottom: 8.0, left: 10.0, right: 10.0),
                       child: InkWell(
                         onTap: () {
                           print('Card di tekan pada indeks $index');
                         },
                         child: Container(
-                          child: const Column(
+                          child: Column(
                             children: [
                               Expanded(
                                 child: Card(
                                   elevation: 4,
-                                  color: Colors.green,
                                   child: Center(child: Text('Wallpaper')),
+                                  color: Colors.green,
                                 ),
                               ),
                               Text(
@@ -90,31 +96,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 50,
-                child: PageView.builder(
-                  itemCount: _kategory.length,
-                  controller:
-                      PageController(viewportFraction: 0.3, initialPage: 2),
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        print('Category di tekan pada indeks $index');
-                      },
-                      child: Card(
-                        elevation: 4,
-                        child: Center(child: Text(_kategory[index])),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
+            CategoryWidget(
+                boxes: boxes), //Memanggil CategoryWidget dari categoryhp.dart
           ];
         },
         body: const Padding(
-          padding: EdgeInsets.only(top: 25.0),
+          padding: EdgeInsets.only(top: 15.0, left: 8.0, right: 8.0),
           child: Display(),
         ),
       ),

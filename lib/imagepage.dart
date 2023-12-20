@@ -46,9 +46,7 @@ class _DisplayState extends State<Display> {
                     ),
                     itemBuilder: (context, index) {
                       return GridTile(
-                        child: Container(
-                          color: Colors.black38,
-                        ),
+                        child: Container(color: Colors.black38),
                       );
                     },
                   ),
@@ -81,24 +79,26 @@ class _DisplayState extends State<Display> {
                     itemBuilder: (BuildContext context, int index) {
                       return GridTile(
                         child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ImageView(
-                                  imgUrl: snapshot.data![index].imageUrl,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImageView(
+                                    imgUrl: snapshot.data![index].imageUrl,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6.0),
+                              child: CachedNetworkImage(
+                                imageUrl: snapshot.data![index].imageUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(),
                                 ),
                               ),
-                            );
-                          },
-                          child: CachedNetworkImage(
-                            imageUrl: snapshot.data![index].imageUrl,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                        ),
+                            )),
                       );
                     },
                   );
