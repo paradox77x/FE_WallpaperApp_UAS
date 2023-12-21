@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import '../views/favorite.dart';
+import 'dart:ui';
 
 class ImageView extends StatefulWidget {
   final String imgUrl;
@@ -16,6 +17,74 @@ class ImageView extends StatefulWidget {
 
   @override
   _ImageViewState createState() => _ImageViewState();
+}
+
+class _BlurredImage extends StatelessWidget {
+  final String imgUrl;
+
+  const _BlurredImage({Key? key, required this.imgUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CachedNetworkImage(
+            imageUrl: imgUrl,
+            fit: BoxFit.cover,
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SmolImage extends StatelessWidget {
+  final String imgUrl;
+
+  _SmolImage({required this.imgUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          // BorderRadius.circular(10), // Set the border radius
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height / 1.35,
+          width: MediaQuery.of(context).size.width / 1.35,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 2.0,
+            ),
+          ),
+          child: CachedNetworkImage(
+            imageUrl: imgUrl,
+            fit: BoxFit.cover,
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _ImageViewState extends State<ImageView> {
@@ -36,19 +105,119 @@ class _ImageViewState extends State<ImageView> {
   }
 
   Widget _buildFavoriteIcon() {
-    return FutureBuilder<bool?>(
-      future: _isFavorite(),
-      builder: (context, snapshot) {
-        bool isFavorite = snapshot.data ?? false;
-        return IconButton(
-          icon: Icon(
-            isFavorite ? Icons.favorite : Icons.favorite_border,
-            size: 50,
-            color: Colors.white,
-          ),
-          onPressed: _toggleFavorite,
-        );
+    return GestureDetector(
+      onTap: () {
+        _toggleFavorite();
       },
+      child: Container(
+        height: 40,
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomRight: Radius.circular(8),
+            topRight: Radius.circular(8),
+            bottomLeft: Radius.circular(40),
+            topLeft: Radius.circular(40),
+          ),
+          border: Border.all(
+            color: Colors.white,
+            width: 1.0,
+          ),
+          // color: Colors.black54.withOpacity(0.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FutureBuilder<bool?>(
+              future: _isFavorite(),
+              builder: (context, snapshot) {
+                bool isFavorite = snapshot.data ?? false;
+                return Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  size: 20,
+                  color: Colors.white,
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "Favorite",
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDownloadIcon() {
+    return GestureDetector(
+      onTap: () {
+        _saveImage();
+      },
+      child: Container(
+        height: 40,
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(5),
+              topRight: Radius.circular(5),
+              bottomLeft: Radius.circular(5),
+              topLeft: Radius.circular(5)),
+          border: Border.all(color: Colors.white, width: 1.0),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.download,
+              size: 20,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "Download",
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSetAsIcon() {
+    return GestureDetector(
+      onTap: () {
+        _showApplyWallpaperDialog();
+      },
+      child: Container(
+        height: 40,
+        width: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomRight: Radius.circular(40),
+            topRight: Radius.circular(40),
+            bottomLeft: Radius.circular(9),
+            topLeft: Radius.circular(9),
+          ),
+          border: Border.all(color: Colors.white, width: 1.0),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.crop_free_rounded,
+              size: 20,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "Set As",
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -168,79 +337,53 @@ class _ImageViewState extends State<ImageView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Image View'),
+        // title: const Text('Image View'),
+        backgroundColor: Colors.black.withOpacity(0.3),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
+        iconTheme:
+            IconThemeData(color: const Color.fromARGB(255, 255, 255, 255)),
       ),
-      body: Stack(
-        children: <Widget>[
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: CachedNetworkImage(
-              imageUrl: widget.imgUrl,
-              fit: BoxFit.cover,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 70,
-                  width: 70,
-                  color: Colors.black54,
-                  child: _buildFavoriteIcon(),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Container(
-                  height: 70,
-                  width: 70,
-                  color: Colors.black54,
-                  child: IconButton(
-                    onPressed: () {
-                      _saveImage();
-                    },
-                    icon: const Icon(
-                      Icons.download,
-                      size: 50,
-                      color: Colors.white,
+      body: Container(
+        child: Stack(
+          children: <Widget>[
+            _BlurredImage(imgUrl: widget.imgUrl),
+            _SmolImage(imgUrl: widget.imgUrl),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 85,
+                color: Colors.black.withOpacity(
+                    0.3), // Set the background color for the entire row
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: _buildFavoriteIcon(),
                     ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Container(
-                  height: 70,
-                  width: 70,
-                  color: Colors.black54,
-                  child: IconButton(
-                    onPressed: () {
-                      _showApplyWallpaperDialog();
-                    },
-                    icon: const Icon(
-                      Icons.crop_free_rounded,
-                      size: 50,
-                      color: Colors.white,
+                    const SizedBox(
+                      width: 5,
                     ),
-                  ),
+                    Container(
+                      child: _buildDownloadIcon(),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Container(child: _buildSetAsIcon()),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -14,10 +14,10 @@ class _HomePageState extends State<HomePage> {
   final int _index = 0;
   int index_size = 0;
   static List<BoxData> boxes = [
-    BoxData("Nature", "lib/wallpapers/alam.jpg"),
-    BoxData("Game", "lib/wallpapers/game.jpg"),
-    BoxData("Hot", "lib/wallpapers/hot.jpg"),
-    BoxData("Sexy", "lib/wallpapers/sexy.jpg"),
+    BoxData("Food", "food", "lib/wallpapers/alam.jpg"),
+    BoxData("Car", "car", "lib/wallpapers/game.jpg"),
+    BoxData("Hot", "hot", "lib/wallpapers/hot.jpg"),
+    BoxData("Sexy", "sexy", "lib/wallpapers/sexy.jpg"),
   ];
 
   @override
