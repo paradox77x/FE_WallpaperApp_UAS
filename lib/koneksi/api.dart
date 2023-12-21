@@ -1,47 +1,68 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-
-class WallpaperModel {
-  final String arturl;
-  final int sensitivity;
-
-  WallpaperModel({
-    required this.arturl,
-    required this.sensitivity,
-  });
-
-  factory WallpaperModel.fromMap(Map<String, dynamic> json) {
-    return WallpaperModel(
-      arturl: json["arturl"],
-      sensitivity: json["sensitivity"],
-    );
-  }
-}
+import 'package:http/http.dart' as http;
 
 class HttpHelper {
   Future<List<WallpaperModel>> getpics() async {
-    int page = 20;
+    final response = await http.get(Uri.parse('http://206.189.47.152/api/get'));
 
-    final result = await http.get(
-      Uri.https(
-          'premium-anime-mobile-wallpapers-illustrations.p.rapidapi.com',
-          '/rapidHandler/boy',
-          {'page': '$page', 'sensitivity': '0', 'quality': '1'}),
-      headers: {
-        'X-RapidAPI-Key': '83e2da651dmsh599416407f986b6p1bd989jsn8fbd6568aac5',
-        'X-RapidAPI-Host':
-            'premium-anime-mobile-wallpapers-illustrations.p.rapidapi.com'
-      },
-    );
-    if (result.statusCode == HttpStatus.ok) {
-      final jsonResponse = json.decode(result.body);
-      List<WallpaperModel> callimage = jsonResponse
-          .map<WallpaperModel>((i) => WallpaperModel.fromMap(i))
-          .toList();
-      return callimage;
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)['data'];
+      List<WallpaperModel> wallpapers =
+          data.map((json) => WallpaperModel.fromJson(json)).toList();
+      return wallpapers;
     } else {
-      return [];
+      throw Exception('Failed to load data');
     }
+  }
+
+  Future<List<WallpaperModel>> getCategoryPics(String category) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://206.189.47.152/api/get'),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body)['data'];
+        List<WallpaperModel> wallpapers = data
+            .map((json) => WallpaperModel.fromJson(json))
+            .where((wallpaper) {
+          return wallpaper.category == category;
+        }).toList();
+        return wallpapers;
+      } else {
+        throw Exception('Failed to load category images');
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+}
+
+class WallpaperModel {
+  final int id;
+  final String category;
+  final String imageFileName;
+  final String imageUrl;
+  final String createdAt;
+  final String updatedAt;
+
+  WallpaperModel({
+    required this.id,
+    required this.category,
+    required this.imageFileName,
+    required this.imageUrl,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory WallpaperModel.fromJson(Map<String, dynamic> json) {
+    return WallpaperModel(
+      id: json['id'],
+      category: json['category'],
+      imageFileName: json['image_file_name'],
+      imageUrl: json['image_url'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+    );
   }
 }
