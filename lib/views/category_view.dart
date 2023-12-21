@@ -14,7 +14,7 @@ class _CategoryViewState extends State<CategoryView> {
   int index_size = 0;
   static List<BoxData> boxes = [
     BoxData("Food", "food", "lib/wallpapers/alam.jpg"),
-    BoxData("Car", "car", "lib/wallpapers/game.jpg"),
+    BoxData("Vehicle", "vehicle", "lib/wallpapers/game.jpg"),
     BoxData("Hot", "hot", "lib/wallpapers/hot.jpg"),
     BoxData("Sexy", "sexy", "lib/wallpapers/sexy.jpg"),
   ];

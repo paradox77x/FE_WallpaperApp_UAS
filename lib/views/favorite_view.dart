@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:uas_pemweb/homepage.dart';
 import 'favorite.dart';
 import 'ImageView.dart';
+import '../views/bottom_navigation.dart';
 
 class FavoriteView extends StatefulWidget {
   const FavoriteView({super.key});
@@ -12,6 +14,7 @@ class FavoriteView extends StatefulWidget {
 
 class _FavoriteViewState extends State<FavoriteView> {
   late Future<List<String>> _favoriteImages;
+  final int _index = 1;
 
   @override
   void initState() {
@@ -51,6 +54,33 @@ class _FavoriteViewState extends State<FavoriteView> {
               },
             );
           }
+        },
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _index,
+        onTap: (index) {
+          setState(() {
+            // Handle navigasi berdasarkan indeks yang dipilih di sini
+            switch (index) {
+              case 0:
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                );
+                break;
+              case 1:
+                break;
+
+              case 2:
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => FavoriteView(),
+                  ),
+                );
+                break;
+            }
+          });
         },
       ),
     );

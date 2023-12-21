@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../imagepage.dart';
 import '../views/favorite_view.dart';
 import '../category.dart';
+import '../views/bottom_navigation.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   int index_size = 0;
   static List<BoxData> boxes = [
     BoxData("Food", "food", "lib/wallpapers/alam.jpg"),
-    BoxData("Car", "car", "lib/wallpapers/game.jpg"),
+    BoxData("Vehicle", "vehicle", "lib/wallpapers/game.jpg"),
     BoxData("Hot", "hot", "lib/wallpapers/hot.jpg"),
     BoxData("Sexy", "sexy", "lib/wallpapers/sexy.jpg"),
   ];
@@ -104,6 +105,33 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.only(top: 15.0, left: 8.0, right: 8.0),
           child: Display(),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _index,
+        onTap: (index) {
+          setState(() {
+            // Handle navigasi berdasarkan indeks yang dipilih di sini
+            switch (index) {
+              case 0:
+                break;
+              case 1:
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => FavoriteView(),
+                  ),
+                );
+                break;
+
+              case 2:
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => FavoriteView(),
+                  ),
+                );
+                break;
+            }
+          });
+        },
       ),
     );
   }
