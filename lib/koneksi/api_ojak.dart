@@ -1,4 +1,3 @@
-// api.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -8,12 +7,33 @@ class HttpHelper {
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body)['data'];
-      print(data[0]);
       List<WallpaperModel> wallpapers =
           data.map((json) => WallpaperModel.fromJson(json)).toList();
       return wallpapers;
     } else {
       throw Exception('Failed to load data');
+    }
+  }
+
+  Future<List<WallpaperModel>> getCategoryPics(String category) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://206.189.47.152/api/get'),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body)['data'];
+        List<WallpaperModel> wallpapers = data
+            .map((json) => WallpaperModel.fromJson(json))
+            .where((wallpaper) {
+          return wallpaper.category == category;
+        }).toList();
+        return wallpapers;
+      } else {
+        throw Exception('Failed to load category images');
+      }
+    } catch (e) {
+      throw e;
     }
   }
 }
