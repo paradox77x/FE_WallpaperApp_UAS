@@ -21,7 +21,7 @@ class HttpHelper {
   Future<List<WallpaperModel>> getCategoryPics(String category) async {
     try {
       final response = await http.get(
-        Uri.parse('https://uas.medeon.my.id/api/get'),
+        Uri.parse('https://uas.medeon.my.id/api/get?category=$category'),
       );
 
       if (response.statusCode == 200) {

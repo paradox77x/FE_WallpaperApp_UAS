@@ -18,10 +18,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
       unselectedLabelStyle: const TextStyle(color: Colors.white),
       currentIndex: currentIndex,
       iconSize: 25,
+      selectedFontSize: 12, // Ukuran font ikon terpilih
+      unselectedFontSize: 12, // Ukuran font ikon tidak terpilih
+      type: BottomNavigationBarType
+          .fixed, // Tetap menggunakan ukuran yang sama untuk setiap ikon
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
           label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.category),
+          label: 'Category',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite_outline),

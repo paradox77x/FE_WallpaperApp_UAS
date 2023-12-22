@@ -3,6 +3,8 @@ import '../imagepage.dart';
 import '../views/favorite_view.dart';
 import '../category.dart';
 import '../views/bottom_navigation.dart';
+import '../views/category_list.dart';
+import '../koneksi/category_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,12 +16,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final int _index = 0;
   int index_size = 0;
-  static List<BoxData> boxes = [
-    BoxData("Food", "food", "lib/wallpapers/alam.jpg"),
-    BoxData("Vehicle", "vehicle", "lib/wallpapers/game.jpg"),
-    BoxData("Hot", "hot", "lib/wallpapers/hot.jpg"),
-    BoxData("Sexy", "sexy", "lib/wallpapers/sexy.jpg"),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +113,7 @@ class _HomePageState extends State<HomePage> {
               case 1:
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => FavoriteView(),
+                    builder: (context) => CategoryList(),
                   ),
                 );
                 break;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:uas_pemweb/homepage.dart';
+import 'package:uas_pemweb/views/category_list.dart';
 import 'favorite.dart';
 import 'ImageView.dart';
 import '../views/bottom_navigation.dart';
@@ -14,7 +15,7 @@ class FavoriteView extends StatefulWidget {
 
 class _FavoriteViewState extends State<FavoriteView> {
   late Future<List<String>> _favoriteImages;
-  final int _index = 1;
+  final int _index = 2;
 
   @override
   void initState() {
@@ -70,14 +71,14 @@ class _FavoriteViewState extends State<FavoriteView> {
                 );
                 break;
               case 1:
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CategoryList(),
+                  ),
+                );
                 break;
 
               case 2:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => FavoriteView(),
-                  ),
-                );
                 break;
             }
           });

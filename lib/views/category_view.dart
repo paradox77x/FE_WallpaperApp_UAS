@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../imagepage.dart';
 import '../views/favorite_view.dart';
 import '../category.dart';
+import '../koneksi/category_data.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -12,12 +13,6 @@ class CategoryView extends StatefulWidget {
 
 class _CategoryViewState extends State<CategoryView> {
   int index_size = 0;
-  static List<BoxData> boxes = [
-    BoxData("Food", "food", "lib/wallpapers/alam.jpg"),
-    BoxData("Vehicle", "vehicle", "lib/wallpapers/game.jpg"),
-    BoxData("Hot", "hot", "lib/wallpapers/hot.jpg"),
-    BoxData("Sexy", "sexy", "lib/wallpapers/sexy.jpg"),
-  ];
 
   @override
   Widget build(BuildContext context) {
