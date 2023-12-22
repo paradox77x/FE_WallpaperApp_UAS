@@ -7,3 +7,18 @@ Project Pemrograman Website dan Mobile
 - flutter upgrade
 - flutter pub get
 - flutter run
+
+### Contributor
+
+- Abdul Aziz
+- Ilham Ambia
+- Devin Wijaya
+- Dicky Saputra
+- Rojak Kurniawan
+- Aditya Sastraatmaja
+- Ahmad Rafi Kannajmi
+- Muhammad Alviansyah
+- Daffa Dzaky Syahbani
+- Muhammad Damar Firdaus
+- Muhammad Rifqi Arrasyid
+- Muhammad Rizqi Fadhillah
