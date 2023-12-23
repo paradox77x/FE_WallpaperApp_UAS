@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 
-class CustomBottomNavigationBar extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
+class BottomNavigationBarWidget extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemTapped;
 
-  const CustomBottomNavigationBar({
+  const BottomNavigationBarWidget({
     Key? key,
-    required this.currentIndex,
-    required this.onTap,
+    required this.selectedIndex,
+    required this.onItemTapped,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      currentIndex: selectedIndex,
+      showUnselectedLabels: false,
       selectedItemColor: Colors.black,
-      unselectedItemColor: const Color.fromARGB(255, 151, 150, 150),
-      unselectedLabelStyle: const TextStyle(color: Colors.white),
-      currentIndex: currentIndex,
-      iconSize: 25,
-      selectedFontSize: 12, // Ukuran font ikon terpilih
-      unselectedFontSize: 12, // Ukuran font ikon tidak terpilih
-      type: BottomNavigationBarType
-          .fixed, // Tetap menggunakan ukuran yang sama untuk setiap ikon
+      unselectedItemColor: Colors.grey,
+      type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
@@ -32,15 +28,15 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'Category',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite_outline),
+          icon: Icon(Icons.favorite),
           label: 'Favorite',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person_outlined),
+          icon: Icon(Icons.settings),
           label: 'About',
         ),
       ],
-      onTap: onTap,
+      onTap: onItemTapped,
     );
   }
 }

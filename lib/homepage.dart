@@ -1,21 +1,56 @@
 import 'package:flutter/material.dart';
-import '../imagepage.dart';
-import '../views/favorite_view.dart';
-import '../category.dart';
+import 'package:uas_pemweb/category.dart';
+import 'package:uas_pemweb/imagepage.dart';
+import 'package:uas_pemweb/koneksi/category_data.dart';
+import 'package:uas_pemweb/views/aboutus.dart';
+import 'package:uas_pemweb/views/category_list.dart';
 import '../views/bottom_navigation.dart';
-import '../views/category_list.dart';
-import '../koneksi/category_data.dart';
+import '../views/favorite_view.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final int _index = 0;
-  int index_size = 0;
+  late PageController _pageController;
+  int _totalPages = 10; // Jumlah total halaman wallpaper
+  bool _pageHasChangedManually = false;
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      if (_selectedIndex != index) {
+        _selectedIndex = index;
+
+        // Handle navigation based on the tapped index
+        if (_selectedIndex == 0) {
+          // Navigate to Home
+        } else if (_selectedIndex == 1) {
+          // Navigate to FavoriteView
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CategoryList()),
+            (route) => false,
+          );
+        } else if (_selectedIndex == 2) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const FavoriteView()),
+            (route) => false,
+          );
+        } else if (_selectedIndex == 3) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => AboutPage()),
+            (route) => false,
+          );
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,24 +63,6 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.favorite,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FavoriteView()),
-              );
-            },
-          ),
-        ],
       ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -59,6 +76,7 @@ class _HomePageState extends State<HomePage> {
                       PageController(viewportFraction: 0.5, initialPage: 3),
                   // onPageChanged: (index) => setState(() => _index = index),
                   itemBuilder: (context, index) {
+                    var _index;
                     return AnimatedPadding(
                       duration: const Duration(milliseconds: 400),
                       curve: Curves.fastOutSlowIn,
@@ -102,32 +120,9 @@ class _HomePageState extends State<HomePage> {
           child: Display(),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _index,
-        onTap: (index) {
-          setState(() {
-            // Handle navigasi berdasarkan indeks yang dipilih di sini
-            switch (index) {
-              case 0:
-                break;
-              case 1:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CategoryList(),
-                  ),
-                );
-                break;
-
-              case 2:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => FavoriteView(),
-                  ),
-                );
-                break;
-            }
-          });
-        },
+      bottomNavigationBar: BottomNavigationBarWidget(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }

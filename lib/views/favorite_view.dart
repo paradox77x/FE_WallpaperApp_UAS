@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:uas_pemweb/homepage.dart';
+import 'package:uas_pemweb/views/aboutus.dart';
 import 'package:uas_pemweb/views/category_list.dart';
 import 'favorite.dart';
 import 'ImageView.dart';
@@ -16,6 +17,38 @@ class FavoriteView extends StatefulWidget {
 class _FavoriteViewState extends State<FavoriteView> {
   late Future<List<String>> _favoriteImages;
   final int _index = 2;
+  int _selectedIndex = 2;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      if (_selectedIndex != index) {
+        _selectedIndex = index;
+
+        // Handle navigation based on the tapped index
+        if (_selectedIndex == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+            (route) => false,
+          );
+        } else if (_selectedIndex == 1) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CategoryList()),
+            (route) => false,
+          );
+        } else if (_selectedIndex == 2) {
+          // Favorite View
+        } else if (_selectedIndex == 3) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const AboutPage()),
+            (route) => false,
+          );
+        }
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -57,32 +90,9 @@ class _FavoriteViewState extends State<FavoriteView> {
           }
         },
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _index,
-        onTap: (index) {
-          setState(() {
-            // Handle navigasi berdasarkan indeks yang dipilih di sini
-            switch (index) {
-              case 0:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(),
-                  ),
-                );
-                break;
-              case 1:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CategoryList(),
-                  ),
-                );
-                break;
-
-              case 2:
-                break;
-            }
-          });
-        },
+      bottomNavigationBar: BottomNavigationBarWidget(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
