@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-import '../koneksi/api.dart';
-import '../views/ImageView.dart';
-import '../koneksi/category_data.dart';
+import 'package:uas_pemweb/koneksi/api.dart';
+import 'package:uas_pemweb/koneksi/category_data.dart';
+import 'package:uas_pemweb/views/ImageView.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -28,30 +28,53 @@ String findImagePathByParameter(String parameter) {
   return box.imagePath;
 }
 
-class imageBottom extends StatelessWidget {
-  final Future<List<WallpaperModel>> future;
+class ImageBottom extends StatelessWidget {
+  final List<WallpaperModel>? data;
 
-  imageBottom({required this.future});
+  ImageBottom({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: future,
-      builder:
-          (BuildContext context, AsyncSnapshot<List<WallpaperModel>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return buildLoadingGrid();
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return buildErrorGrid();
-          } else {
-            return buildimageBottom(context, snapshot.data);
-          }
-        } else {
-          return buildNoInternetConnection();
-        }
-      },
-    );
+    return data != null
+        ? GridView.builder(
+            padding: EdgeInsets.only(left: 6, right: 6, top: 6),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: data!.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: 0.55,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
+            ),
+            itemBuilder: (BuildContext context, int index) {
+              return GridTile(
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ImageView(
+                          imgUrl: data![index].imageUrl,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6.0),
+                    child: CachedNetworkImage(
+                      imageUrl: data![index].imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          )
+        : buildLoadingGrid();
   }
 
   Widget buildLoadingGrid() {
@@ -77,103 +100,89 @@ class imageBottom extends StatelessWidget {
       ),
     );
   }
-
-  Widget buildErrorGrid() {
-    return const Center(
-      child: Text(
-        'Error loading images.',
-        style: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          color: Colors.black38,
-        ),
-      ),
-    );
-  }
-
-  Widget buildimageBottom(BuildContext context, List<WallpaperModel>? data) {
-    return GridView.builder(
-      padding: EdgeInsets.only(left: 6, right: 6, top: 6),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: (data == null) ? 0 : data.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.55,
-        mainAxisSpacing: 6,
-        crossAxisSpacing: 6,
-      ),
-      itemBuilder: (BuildContext context, int index) {
-        return GridTile(
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ImageView(
-                    imgUrl: data![index].imageUrl,
-                  ),
-                ),
-              );
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6.0),
-              child: CachedNetworkImage(
-                imageUrl: data![index].imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget buildNoInternetConnection() {
-    return const Center(
-      child: Text(
-        'No Internet Connection',
-        style: TextStyle(
-          fontSize: 50,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
 }
 
 class _CategoryImagePageState extends State<CategoryImagePage> {
-  Future<List<WallpaperModel>> fetchCategoryImages() async {
-    HttpHelper helper = HttpHelper();
-    List<WallpaperModel> wallpapers =
-        await helper.getCategoryPics(widget.category);
-    return wallpapers;
+  late ScrollController _scrollController;
+  late List<WallpaperModel>
+      _allWallpapers; // Accumulated list of all wallpapers
+  int _currentPage = 1; // Initial page
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _allWallpapers = [];
+    _fetchCategoryImages(_currentPage);
+
+    // Listen for scroll events
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        // Reached the bottom, load more data
+        _loadMoreData();
+      }
+    });
+  }
+
+  Future<void> _fetchCategoryImages(int page) async {
+    try {
+      HttpHelper helper = HttpHelper();
+      List<WallpaperModel> wallpapers =
+          await helper.getCategoryPics(page, widget.category);
+
+      // Append the new wallpapers to the accumulated list
+      _allWallpapers.addAll(wallpapers);
+
+      setState(() {
+        // Update the UI with the accumulated data
+        // This will trigger a rebuild of the ImageBottom widget
+      });
+    } catch (e) {
+      // Handle exceptions appropriately, e.g., show an error message.
+    }
+  }
+
+  // Load more data when scrolling to the bottom
+  Future<void> _loadMoreData() async {
+    setState(() {
+      _currentPage++;
+    });
+
+    await _fetchCategoryImages(_currentPage);
+  }
+
+  Future<void> _handleRefresh() async {
+    // Reset state to initial values
+    _currentPage = 1;
+    _allWallpapers.clear();
+    await _fetchCategoryImages(_currentPage);
   }
 
   @override
   Widget build(BuildContext context) {
     String imagePath = findImagePathByParameter(widget.category);
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 200.0,
-            floating: false,
-            pinned: true,
-            snap: false,
-            actionsIconTheme: IconThemeData(opacity: 0.0),
-            flexibleSpace: Stack(
-              children: <Widget>[
-                Positioned.fill(
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 200.0,
+              floating: false,
+              pinned: true,
+              snap: false,
+              actionsIconTheme: IconThemeData(opacity: 0.0),
+              flexibleSpace: Stack(
+                children: <Widget>[
+                  Positioned.fill(
                     child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                )),
-                Positioned(
+                      imagePath,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
                     top: 0,
                     left: 0,
                     right: 0,
@@ -187,22 +196,30 @@ class _CategoryImagePageState extends State<CategoryImagePage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )),
-              ],
+                    ),
+                  ),
+                ],
+              ),
+              leading: BackButton(
+                color: Colors.white.withOpacity(0.3),
+              ),
             ),
-            leading: BackButton(
-              color: Colors.white.withOpacity(0.3), // Set the color you want
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  ImageBottom(data: _allWallpapers),
+                ],
+              ),
             ),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                imageBottom(future: fetchCategoryImages()),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

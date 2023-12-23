@@ -21,25 +21,24 @@ class HttpHelper {
     }
   }
 
-  Future<List<WallpaperModel>> getCategoryPics(String category) async {
+  Future<List<WallpaperModel>> getCategoryPics(
+      int page, String category) async {
     try {
       final response = await http.get(
-        Uri.parse('https://uas.medeon.my.id/api/get?category=$category'),
+        Uri.parse(
+            'https://uas.medeon.my.id/api/get?page=$page&category=$category'),
       );
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body)['data'];
-        List<WallpaperModel> wallpapers = data
-            .map((json) => WallpaperModel.fromJson(json))
-            .where((wallpaper) {
-          return wallpaper.category == category;
-        }).toList();
-        return wallpapers;
+        return data.map((json) => WallpaperModel.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load category images');
+        // Handle the situation when there is no data or other errors
+        return [];
       }
     } catch (e) {
-      throw e;
+      // Handle network or other exceptions
+      return [];
     }
   }
 }

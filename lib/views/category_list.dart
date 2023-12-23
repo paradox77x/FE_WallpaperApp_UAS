@@ -62,7 +62,7 @@ class _CategoryListState extends State<CategoryList> {
       appBar: AppBar(
         title: const Text(
           'Category List',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         elevation: 0,

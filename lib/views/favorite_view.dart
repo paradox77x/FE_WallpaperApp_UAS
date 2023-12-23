@@ -59,7 +59,11 @@ class _FavoriteViewState extends State<FavoriteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorite Wallpapers'),
+        title: const Text(
+          'Favorite Wallpapers',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: FutureBuilder<List<String>>(
         future: _favoriteImages,
