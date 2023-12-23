@@ -1,6 +1,13 @@
+// INI CODE WIDGET CATEGORY YG AKAN DIGUNAKAN PADA HOMEPAGE.DART
+// NAMA FILE INI categoryhp.dart | 'hp' singkatan dari homepage
 import 'package:flutter/material.dart';
-import '../views/categoryimagepage.dart'; // Import your CategoryImagePage
-import '../koneksi/category_data.dart';
+
+class BoxData {
+  final String text;
+  final String imagePath;
+
+  BoxData(this.text, this.imagePath);
+}
 
 class CategoryWidget extends StatelessWidget {
   final List<BoxData> boxes;
@@ -19,15 +26,7 @@ class CategoryWidget extends StatelessWidget {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
-                // Navigate to the CategoryImagePage with the selected category
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CategoryImagePage(
-                      category: boxes[index].parameter,
-                    ),
-                  ),
-                );
+                print("Kategori di Tap pada $index");
               },
               child: Padding(
                 padding: const EdgeInsets.only(right: 10.0),
@@ -61,7 +60,7 @@ class CategoryWidget extends StatelessWidget {
                             children: [
                               Text(
                                 boxes[index].text,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -77,7 +76,7 @@ class CategoryWidget extends StatelessWidget {
               ),
             );
           },
-          itemExtent: 210,
+          itemExtent: 225,
         ),
       ),
     );

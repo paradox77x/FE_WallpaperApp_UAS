@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import '../imagepage.dart';
 import '../views/favorite_view.dart';
 import '../category.dart';
-import '../views/bottom_navigation.dart';
-import '../views/category_list.dart';
-import '../koneksi/category_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +14,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final int _index = 0;
   int index_size = 0;
+  int myCurrentIndex = 2;
+  static List<BoxData> boxes = [
+    BoxData("Nature", "lib/wallpapers/alam.jpg"),
+    BoxData("Game", "lib/wallpapers/game.jpg"),
+    BoxData("Hot", "lib/wallpapers/hot.jpg"),
+    BoxData("Sexy", "lib/wallpapers/sexy.jpg"),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -102,31 +107,51 @@ class _HomePageState extends State<HomePage> {
           child: Display(),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _index,
+      bottomNavigationBar: BottomNavigationBar(
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        selectedItemColor: Colors.black,
+        unselectedItemColor:  Colors.white,
+        unselectedLabelStyle: TextStyle(color: Colors.white),
+        // currentIndex: myCurrentIndex,
+        iconSize: 25,
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_outline), label: 'Favorite'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_outlined), label: 'About'),
+        ],
         onTap: (index) {
           setState(() {
-            // Handle navigasi berdasarkan indeks yang dipilih di sini
-            switch (index) {
-              case 0:
-                break;
-              case 1:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CategoryList(),
-                  ),
-                );
-                break;
-
-              case 2:
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => FavoriteView(),
-                  ),
-                );
-                break;
-            }
+            myCurrentIndex = index;
           });
+
+          // Panggil fungsi untuk mengarahkan ke halaman yang sesuai
+          switch (index) {
+            case 0:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                ),
+              );
+              break;
+            case 1:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FavoriteView(),
+                ),
+              );
+              break;
+            case 2:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => FavoriteView(),
+                ),
+              );
+              break;
+          }
         },
       ),
     );
