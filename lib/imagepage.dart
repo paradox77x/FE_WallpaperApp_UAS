@@ -12,63 +12,75 @@ class Display extends StatefulWidget {
 }
 
 class _DisplayState extends State<Display> {
-  Future<List<WallpaperModel>> callPizzas() async {
+  int currentPage = 1;
+  List<WallpaperModel> wallpapers = [];
+  bool isLoading = false;
+  bool hasMore = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMore();
+  }
+
+  void _loadMore() async {
+    if (isLoading || !hasMore) return;
+    setState(() => isLoading = true);
+
     HttpHelper helper = HttpHelper();
-    List<WallpaperModel> wallpapers = await helper.getpics();
-    return wallpapers;
+    List<WallpaperModel> newWallpapers = await helper.getpics(currentPage);
+
+    if (newWallpapers.isEmpty) {
+      setState(() => hasMore = false);
+    } else {
+      currentPage++;
+      setState(() => wallpapers.addAll(newWallpapers));
+    }
+
+    setState(() => isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: FutureBuilder(
-            future: callPizzas(),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<WallpaperModel>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Shimmer.fromColors(
-                  enabled: true,
-                  baseColor: Colors.black54,
-                  highlightColor: Colors.black87,
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 12,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 0.55,
-                      mainAxisSpacing: 6,
-                      crossAxisSpacing: 6,
-                    ),
-                    itemBuilder: (context, index) {
-                      return GridTile(
-                        child: Container(color: Colors.black38),
-                      );
-                    },
-                  ),
-                );
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text(
-                      'Server is down.',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black38,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        if (!isLoading &&
+            hasMore &&
+            scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          _loadMore();
+        }
+        return true;
+      },
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: (isLoading && currentPage == 1)
+                ? Shimmer.fromColors(
+                    enabled: true,
+                    baseColor: Colors.black54,
+                    highlightColor: Colors.black87,
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 12,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.55,
+                        mainAxisSpacing: 6,
+                        crossAxisSpacing: 6,
                       ),
+                      itemBuilder: (context, index) {
+                        return GridTile(
+                          child: Container(color: Colors.black38),
+                        );
+                      },
                     ),
-                  );
-                } else {
-                  return GridView.builder(
+                  )
+                : GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount:
-                        (snapshot.data == null) ? 0 : snapshot.data!.length,
+                    itemCount: wallpapers.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -77,6 +89,7 @@ class _DisplayState extends State<Display> {
                       crossAxisSpacing: 6,
                     ),
                     itemBuilder: (BuildContext context, int index) {
+                      final item = wallpapers[index];
                       return GridTile(
                         child: InkWell(
                             onTap: () {
@@ -84,7 +97,7 @@ class _DisplayState extends State<Display> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ImageView(
-                                    imgUrl: snapshot.data![index].imageUrl,
+                                    imgUrl: item.imageUrl,
                                   ),
                                 ),
                               );
@@ -92,7 +105,7 @@ class _DisplayState extends State<Display> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(6.0),
                               child: CachedNetworkImage(
-                                imageUrl: snapshot.data![index].imageUrl,
+                                imageUrl: item.imageUrl,
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator(),
@@ -101,24 +114,18 @@ class _DisplayState extends State<Display> {
                             )),
                       );
                     },
-                  );
-                }
-              } else {
-                return const Center(
-                  child: Text(
-                    'No Internet Connection',
-                    style: TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
                   ),
-                );
-              }
-            },
           ),
-        ),
-      ],
+          if (isLoading)
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

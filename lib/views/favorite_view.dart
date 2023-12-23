@@ -16,7 +16,6 @@ class FavoriteView extends StatefulWidget {
 
 class _FavoriteViewState extends State<FavoriteView> {
   late Future<List<String>> _favoriteImages;
-  final int _index = 2;
   int _selectedIndex = 2;
 
   void _onItemTapped(int index) {
@@ -42,7 +41,7 @@ class _FavoriteViewState extends State<FavoriteView> {
         } else if (_selectedIndex == 3) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const AboutPage()),
+            MaterialPageRoute(builder: (context) => AboutPage()),
             (route) => false,
           );
         }

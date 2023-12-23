@@ -48,7 +48,7 @@ class _CategoryListState extends State<CategoryList> {
         } else if (_selectedIndex == 3) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const AboutPage()),
+            MaterialPageRoute(builder: (context) => AboutPage()),
             (route) => false,
           );
         }
