@@ -1,55 +1,80 @@
 import 'package:flutter/material.dart';
-import 'package:uas_pemweb/category.dart';
-import 'package:uas_pemweb/imagepage.dart';
-import 'package:uas_pemweb/koneksi/category_data.dart';
-import 'package:uas_pemweb/views/aboutus.dart';
-import 'package:uas_pemweb/views/category_list.dart';
-import '../views/bottom_navigation.dart';
+import '../imagepage.dart';
 import '../views/favorite_view.dart';
+import '../category.dart';
+import '../AboutPage.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  late PageController _pageController;
-  int _totalPages = 10; // Jumlah total halaman wallpaper
-  bool _pageHasChangedManually = false;
   int _selectedIndex = 0;
+  int _index = 0;
+  int _totalPages = 7;
+  late CarouselController _carouselController;
+  static List<BoxData> boxes = [
+    BoxData("Food", "food", "lib/wallpapers/alam.jpg"),
+    BoxData("Car", "car", "lib/wallpapers/game.jpg"),
+    BoxData("Hot", "hot", "lib/wallpapers/hot.jpg"),
+    BoxData("Sexy", "sexy", "lib/wallpapers/sexy.jpg"),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _carouselController = CarouselController();
+
+    // Set nilai tengah dari jumlah total halaman
+    _selectedIndex = _totalPages ~/ 2;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _carouselController.jumpToPage(_selectedIndex);
+    });
+  }
+
+  void _updateIndex(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    _carouselController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.fastOutSlowIn,
+    );
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+      });
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
-      if (_selectedIndex != index) {
-        _selectedIndex = index;
-
-        // Handle navigation based on the tapped index
-        if (_selectedIndex == 0) {
-          // Navigate to Home
-        } else if (_selectedIndex == 1) {
-          // Navigate to FavoriteView
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const CategoryList()),
-            (route) => false,
-          );
-        } else if (_selectedIndex == 2) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const FavoriteView()),
-            (route) => false,
-          );
-        } else if (_selectedIndex == 3) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => AboutPage()),
-            (route) => false,
-          );
-        }
-      }
+      _selectedIndex = index;
     });
+
+    // Handle navigation based on the tapped index
+    if (_selectedIndex == 0) {
+      // Navigate to Home
+    } else if (_selectedIndex == 1) {
+      // Navigate to FavoriteView
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => FavoriteView()),
+        (route) => false,
+      );
+    } else if (_selectedIndex == 2) {
+      // Navigate to About (Settings) - Replace this with your actual settings page
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => AboutPage()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -58,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text(
           'Wallpaper App',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -67,52 +92,94 @@ class _HomePageState extends State<HomePage> {
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
+            SliverAppBar(
+              expandedHeight: 50,
+              floating: false,
+              pinned: false,
+              flexibleSpace: FlexibleSpaceBar(
+                titlePadding: EdgeInsets.only( bottom: 20, left: 20),
+                title: Text(
+                  'Recommended For You',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 320,
-                child: PageView.builder(
-                  itemCount: 10,
-                  controller:
-                      PageController(viewportFraction: 0.5, initialPage: 3),
-                  // onPageChanged: (index) => setState(() => _index = index),
-                  itemBuilder: (context, index) {
-                    var _index;
+                height: 400,
+                width: 300,
+                child: CarouselSlider(
+                  carouselController: _carouselController,
+                  options: CarouselOptions(
+                    viewportFraction:0.7,
+                    // height: double,
+                    aspectRatio: 9/16,
+                    enlargeCenterPage: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                      // Additional logic you want when the page changes
+                    },
+                  ),
+                  items: List.generate(_totalPages, (index) {
+                    double scaleFactor = 0.9;
+                    if (index == _selectedIndex) {
+                      scaleFactor = 1.0;
+                    }
                     return AnimatedPadding(
                       duration: const Duration(milliseconds: 400),
                       curve: Curves.fastOutSlowIn,
-                      padding: _index == index
-                          ? EdgeInsets.only()
-                          : EdgeInsets.only(
-                              top: 8.0, bottom: 8.0, left: 10.0, right: 10.0),
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
                       child: InkWell(
                         onTap: () {
+                          _updateIndex(index);
                           print('Card di tekan pada indeks $index');
                         },
                         child: Container(
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Card(
-                                  elevation: 4,
-                                  child: Center(child: Text('Wallpaper')),
-                                  color: Colors.green,
-                                ),
-                              ),
-                              Text(
-                                'Text at the bottom',
-                                style: TextStyle(fontSize: 16.0),
-                              ),
-                            ],
+                          child: Transform.scale(
+                            scale: scaleFactor,
+                            child: Card(
+                              elevation: 4,
+                              child: Center(child: Text('Wallpaper $index')),
+                              color: _selectedIndex == index
+                                  ? Colors.pink
+                                  : Colors.black,
+                            ),
                           ),
                         ),
                       ),
                     );
-                  },
+                  }),
                 ),
               ),
             ),
-            CategoryWidget(
-                boxes: boxes), //Memanggil CategoryWidget dari categoryhp.dart
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    bottom: 20.0, left: 8.0, right: 8.0, top: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 5),
+                    AnimatedSmoothIndicator(
+                      activeIndex: _selectedIndex % _totalPages,
+                      count: _totalPages,
+                      effect:
+                          ExpandingDotsEffect(dotWidth: 7.5, dotHeight: 7.5),
+                      onDotClicked: (index) {
+                        _updateIndex(index);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            CategoryWidget(boxes: boxes),
           ];
         },
         body: const Padding(
@@ -120,9 +187,26 @@ class _HomePageState extends State<HomePage> {
           child: Display(),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBarWidget(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _index,
+        showUnselectedLabels: false,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'About',
+          ),
+        ],
+        onTap: _onItemTapped,
       ),
     );
   }

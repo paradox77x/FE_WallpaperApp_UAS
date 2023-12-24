@@ -258,7 +258,15 @@ class _ImageViewState extends State<ImageView> {
 
   Future<void> _requestStoragePermission() async {
     var status = await Permission.storage.request();
-    if (status.isDenied) {}
+    if (status.isDenied) {
+      Fluttertoast.showToast(
+        msg: 'Storage permission is required to save the image.',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 
   Future<void> _showApplyWallpaperDialog() async {

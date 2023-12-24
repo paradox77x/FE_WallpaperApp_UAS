@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import '../views/categoryimagepage.dart'; // Import your CategoryImagePage
-import '../koneksi/category_data.dart';
+
+class BoxData {
+  final String text;
+  final String imagePath;
+  final String parameter;
+
+  BoxData(this.text, this.parameter, this.imagePath);
+}
 
 class CategoryWidget extends StatelessWidget {
   final List<BoxData> boxes;

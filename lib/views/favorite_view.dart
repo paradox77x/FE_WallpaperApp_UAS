@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:uas_pemweb/homepage.dart';
-import 'package:uas_pemweb/views/aboutus.dart';
-import 'package:uas_pemweb/views/category_list.dart';
 import 'favorite.dart';
 import 'ImageView.dart';
-import '../views/bottom_navigation.dart';
+import '../homepage.dart';
+import '../AboutPage.dart';
 
 class FavoriteView extends StatefulWidget {
   const FavoriteView({super.key});
@@ -16,38 +14,6 @@ class FavoriteView extends StatefulWidget {
 
 class _FavoriteViewState extends State<FavoriteView> {
   late Future<List<String>> _favoriteImages;
-  int _selectedIndex = 2;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      if (_selectedIndex != index) {
-        _selectedIndex = index;
-
-        // Handle navigation based on the tapped index
-        if (_selectedIndex == 0) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-            (route) => false,
-          );
-        } else if (_selectedIndex == 1) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const CategoryList()),
-            (route) => false,
-          );
-        } else if (_selectedIndex == 2) {
-          // Favorite View
-        } else if (_selectedIndex == 3) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => AboutPage()),
-            (route) => false,
-          );
-        }
-      }
-    });
-  }
 
   @override
   void initState() {
@@ -59,11 +25,19 @@ class _FavoriteViewState extends State<FavoriteView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Favorite Wallpapers',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Favorite Wallpapers'),
         centerTitle: true,
+        backgroundColor: Colors.pink,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+              (route) => false,
+            );
+          },
+        ),
       ),
       body: FutureBuilder<List<String>>(
         future: _favoriteImages,
@@ -93,9 +67,46 @@ class _FavoriteViewState extends State<FavoriteView> {
           }
         },
       ),
-      bottomNavigationBar: BottomNavigationBarWidget(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1, // Sesuaikan dengan indeks yang benar
+        showUnselectedLabels: false,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'About',
+          ),
+        ],
+        onTap: (index) {
+          // Handle navigation based on the tapped index
+          if (index == 0) {
+            // Navigate to Home
+            // Navigator.pushNamed(context, '/');
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+              (route) => false,
+            );
+          } else if (index == 1) {
+            // You are already on the 'FavoriteView', no need to navigate.
+          } else if (index == 2) {
+            // Navigate to AboutPage
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => AboutPage()),
+              (route) => false,
+            );
+          }
+        },
       ),
     );
   }

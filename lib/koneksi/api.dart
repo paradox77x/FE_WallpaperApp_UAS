@@ -1,76 +1,47 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 
-class HttpHelper {
-  Future<List<WallpaperModel>> getpics(int page) async {
-    try {
-      final response = await http.get(
-        Uri.parse('https://uas.medeon.my.id/api/get?page=$page'),
-      );
+class WallpaperModel {
+  final String arturl;
+  final int sensitivity;
 
-      if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body)['data'];
-        return data.map((json) => WallpaperModel.fromJson(json)).toList();
-      } else {
-        // Tangani situasi ketika tidak ada data atau kesalahan lain
-        return [];
-      }
-    } catch (e) {
-      // Tangani exception jaringan atau lainnya
-      return [];
-    }
-  }
+  WallpaperModel({
+    required this.arturl,
+    required this.sensitivity,
+  });
 
-  Future<List<WallpaperModel>> getCategoryPics(
-      int page, String category) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-            'https://uas.medeon.my.id/api/get?page=$page&category=$category'),
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = json.decode(response.body)['data'];
-        return data.map((json) => WallpaperModel.fromJson(json)).toList();
-      } else {
-        // Handle the situation when there is no data or other errors
-        return [];
-      }
-    } catch (e) {
-      // Handle network or other exceptions
-      return [];
-    }
+  factory WallpaperModel.fromMap(Map<String, dynamic> json) {
+    return WallpaperModel(
+      arturl: json["arturl"],
+      sensitivity: json["sensitivity"],
+    );
   }
 }
 
-class WallpaperModel {
-  final String id;
-  final String category;
-  final String imageFileName;
-  final String imageUrl;
-  final String imageDown;
-  final String createdAt;
-  final String updatedAt;
+class HttpHelper {
+  Future<List<WallpaperModel>> getpics() async {
+    int page = 20;
 
-  WallpaperModel({
-    required this.id,
-    required this.category,
-    required this.imageFileName,
-    required this.imageUrl,
-    required this.imageDown,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  factory WallpaperModel.fromJson(Map<String, dynamic> json) {
-    return WallpaperModel(
-      id: json['id'],
-      category: json['category'],
-      imageFileName: json['image_file_name'],
-      imageUrl: json['image_url'],
-      imageDown: json['image_download'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+    final result = await http.get(
+      Uri.https(
+          'premium-anime-mobile-wallpapers-illustrations.p.rapidapi.com',
+          '/rapidHandler/boy',
+          {'page': '$page', 'sensitivity': '0', 'quality': '1'}),
+      headers: {
+        'X-RapidAPI-Key': '83e2da651dmsh599416407f986b6p1bd989jsn8fbd6568aac5',
+        'X-RapidAPI-Host':
+            'premium-anime-mobile-wallpapers-illustrations.p.rapidapi.com'
+      },
     );
+    if (result.statusCode == HttpStatus.ok) {
+      final jsonResponse = json.decode(result.body);
+      List<WallpaperModel> callimage = jsonResponse
+          .map<WallpaperModel>((i) => WallpaperModel.fromMap(i))
+          .toList();
+      return callimage;
+    } else {
+      return [];
+    }
   }
 }
